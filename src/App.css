@@ -1,0 +1,580 @@
+:root {
+  --bg-color: #e6e6e6;
+  --ink-color: #111111;
+  --grid-line: #1111113d;
+}
+
+/* 기본 리셋 + 배경 그리드 + 노이즈 */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--bg-color);
+  color: var(--ink-color);
+  line-height: 1.4;
+  font-size: 14px;
+
+  /* respinner 스타일 그리드 배경 */
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* 종이 노이즈 텍스처 */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+  mix-blend-mode: multiply;
+}
+
+/* 앱 레이아웃 */
+
+.app-root {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.app-inner {
+  position: relative;
+  /* width: 100%; */
+  /* max-width: 1200px; */
+}
+
+.app-title {
+  width: 100%;
+  letter-spacing: -0.05em;
+  border-bottom: 2px solid #111111;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  font-weight: 800;
+  line-height: 0.9;
+  display: inline-block;
+}
+
+/* 자판기 레이아웃 */
+
+.vending-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+/* 자판기 본체 + 오른쪽 패널 = respinner 카드 스타일 */
+
+.machine,
+.panel {
+  border-radius: 12px;
+  border: 2px solid var(--ink-color);
+  background: #fdfdfd;
+  box-shadow: 4px 4px 0 var(--ink-color);
+  padding: 1.5rem;
+}
+
+.machine {
+  width: 560px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 전광판 */
+
+.machine__display {
+  border-radius: 8px;
+  border: 1px solid var(--ink-color);
+  /* background: #483f8c; */
+  padding: 1.55rem 0.9rem;
+  margin-bottom: 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  /* color: #e5e7eb; */
+}
+
+.machine__display-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.machine__display-row--with-action {
+  align-items: center;
+}
+
+.machine__display-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.machine__display-message {
+  margin-top: 0.35rem;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 메시지 타입별 색 + 항상 흔들리는 애니메이션 */
+
+.machine__display-message--idle {
+  color: #111111;
+  animation: shake 0.18s ease-in-out 0s 2;
+}
+
+.machine__display-message--info {
+  color: #4ade80;
+  animation: shake 0.18s ease-in-out 0s 2;
+}
+
+.machine__display-message--error {
+  color: #f97373;
+  animation: shake 0.18s ease-in-out 0s 2;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* 음료 슬롯 그리드 */
+
+.machine__drinks {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+/* 번호 키패드: respinner 패널 느낌 */
+
+.machine__keypad {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--ink-color);
+  padding: 0.75rem 0.75rem 0.5rem;
+  background-color: #f3f4f6;
+}
+
+.machine__keypad--active {
+  box-shadow: 0 0 0 1px #38bdf8;
+}
+
+.machine__keypad-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.machine__keypad-selected {
+  font-size: 13px;
+  opacity: 0.95;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* 키패드 그리드 */
+
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.keypad-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* 공통 버튼: respinner link-button 스타일 변형 */
+
+.btn {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--ink-color);
+  background-color: #ffffff;
+  color: var(--ink-color);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.1s;
+}
+
+.btn:hover:not(:disabled) {
+  background-color: var(--ink-color);
+  color: #ffffff;
+  box-shadow: 2px 2px 0 var(--ink-color);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+/* 버튼 포커스 시 기본 파란 아웃라인 제거 */
+.btn:focus,
+.btn:focus-visible {
+  outline: none;
+}
+
+/* 거스름돈 반환 / 카드 꺼내기용 공통 보라색 버튼 */
+.btn-primary {
+  background-color: #8169ff;
+  border-color: #8169ff;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #5f4aff;
+  border-color: #5f4aff;
+  color: #ffffff;
+}
+
+/* 키패드 버튼 */
+
+.btn-keypad {
+  padding: 0.45rem 0;
+  text-align: center;
+  border-radius: 6px;
+  font-weight: 600;
+  background-color: #f9fafb;
+}
+
+.btn-keypad:focus {
+  outline: none;
+}
+
+.btn-keypad--active {
+  border-color: #38bdf8;
+  background-color: #e0f2fe;
+}
+
+/* 키패드용: 다시 입력 / 확인 색상 */
+
+.btn-keypad-clear {
+  background-color: #f3f0ff;
+  border-color: #8169ff;
+  color: #3f2eac;
+  font-weight: 500;
+}
+
+.btn-keypad-clear:hover:not(:disabled) {
+  background-color: #e3ddff;
+  border-color: #5f4aff;
+  color: #2b227a;
+}
+
+.btn-keypad-confirm {
+  background-color: #8169ff;
+  border-color: #8169ff;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-keypad-confirm:hover:not(:disabled) {
+  background-color: #5f4aff;
+  border-color: #5f4aff;
+  color: #ffffff;
+}
+
+/* 작은 버튼 (슬롯 안) */
+
+.btn-small {
+  padding: 0.35rem 0.8rem;
+  font-size: 12px;
+  border-radius: 999px;
+}
+
+/* 다양한 버튼 모양 */
+
+.btn-toggle {
+  flex: 1;
+}
+
+.btn-toggle--active {
+  border-color: #f97316;
+  background-color: #ffedd5;
+}
+
+.btn-cash {
+  min-width: 90px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* 배출 슬롯: 음료 / 거스름돈 */
+
+.machine__slots {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.machine__slot {
+  flex: 1;
+  min-height: 60px;
+  border-radius: 8px;
+  border: 1px solid var(--ink-color);
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.machine__slot-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+/* 오른쪽 패널 */
+
+.panel {
+  width: 276px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel-section {
+  border-radius: 8px;
+  border: 1px solid var(--ink-color);
+  background-color: #f9fafb;
+  padding: 0.75rem 1rem;
+}
+
+.panel-label {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.panel-value {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.panel-hint {
+  margin-top: 0.5rem;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* 음료 카드 = respinner 카드 느낌 */
+
+.drink-card {
+  width: 100%;
+  text-align: left;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid var(--ink-color);
+  padding: 0.6rem 0.75rem;
+  position: relative;
+  cursor: unset;
+}
+
+.drink-card__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.drink-card__name {
+  font-weight: 600;
+}
+
+.drink-card__soldout-tag {
+  font-size: 11px;
+  color: #f97373;
+  margin-left: 4px;
+}
+
+.drink-card__slot {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background-color: rgba(148, 163, 184, 0.2);
+  align-self: flex-start;
+}
+
+.drink-card__meta {
+  display: flex;
+  font-size: 12px;
+  opacity: 0.9;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.drink-card__helper {
+  font-size: 11px;
+  color: #f97373;
+  margin-top: 4px;
+}
+
+/* 상태별 카드 */
+
+.drink-card--available {
+  box-shadow: 0 0 0 1px #22c55e;
+  background: radial-gradient(circle at top, #bbf7d0 0%, #ffffff 55%);
+}
+
+.drink-card--unaffordable {
+  opacity: 0.6;
+}
+
+.drink-card--soldout {
+  opacity: 0.35;
+  border-style: dashed;
+}
+
+/* 재고 점 표시 */
+
+.drink-card__stock {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.drink-card__stock-label {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.drink-card__dots {
+  display: flex;
+  gap: 2px;
+}
+
+.drink-card__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background-color: transparent;
+}
+
+.drink-card__dot--filled {
+  background-color: #4ade80;
+  border-color: #4ade80;
+}
+
+/* 선택된 슬롯 강조 (필요하면 나중에 사용) */
+
+.drink-card--selected {
+  box-shadow: 0 0 0 1px #38bdf8;
+}
+
+/* 말풍선 */
+
+.bubble {
+  position: absolute;
+  top: 0;
+  left: 12px;
+  transform: translateY(-60%);
+  max-width: 320px;
+}
+
+.bubble__content {
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+  background-color: #1f2933;
+  border: 1px solid #4b5563;
+  font-size: 13px;
+  color: #e5e7eb;
+}
+
+.bubble__label {
+  font-size: 11px;
+  opacity: 0.75;
+  margin-bottom: 2px;
+}
+
+.bubble__message {
+  font-size: 13px;
+}
+
+.bubble__tail {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 10px 0 0;
+  border-color: #1f2933 transparent transparent transparent;
+  margin-left: 1.5rem;
+}
+
+.bubble--info .bubble__content {
+  border-color: #38bdf8;
+  background-color: #0f172a;
+}
+
+.bubble--error .bubble__content {
+  border-color: #f97373;
+  background-color: #3b0f12;
+}
+
+/* 반응형: 좁은 화면에서 위아래로 쌓이게 */
+
+@media (max-width: 768px) {
+  .vending-layout {
+    flex-direction: column;
+  }
+
+  .machine,
+  .panel {
+    width: 100%;
+  }
+}
